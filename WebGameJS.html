@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>thing</title>
+</head>
+<body>
+
+    <div id="fullGame">
+        <canvas id="canv" width="1400" height="700"></canvas>
+        <p id ="points"> score: 0 --lives: 3</p>
+    </div>
+    <button onclick="toggle()"> switch </button>
+    <div id="scoreboard">
+        <table style="width:100%">
+              <tr>
+                  <th>Zuzu's score</th> <td>101</td>
+                  <th>myriam's's score</th> <td>100</td>
+                  <th>highest score</th> <td><p id="ScoreThing"></p></td>
+              </tr>
+        </table>
+    </div>
+    <style>
+        canvas{
+        border: 1px solid blue;
+        }
+	    table, th, td{
+        border: 1px solid black;
+        display: block;
+	    }
+    </style>
+
+    <script>
+        tableVisible = true;
+        function toggle(){
+            if (tableVisible == true){
+                document.getElementById("scoreboard").style.display="none";
+                document.getElementById("fullGame").style.display="block";
+            }
+            else{
+                document.getElementById("scoreboard").style.display="block";
+                document.getElementById("fullGame").style.display="none";
+            }
+            tableVisible = !tableVisible;
+        }
+        var mathCanvas = document.getElementById("canv");
+
+        var ctx = mathCanvas.getContext("2d");
+
+        var img = new Image();
+        var bulletImg = new Image();
+        var enemyImg = new Image();
+        img.src = "dude.png";
+        bulletImg.src = "castle.png";
+        enemyImg.src = "badguy.png";
+
+        var xPos = 0;
+        var yPos = 0;
+
+        var isBullet = false;
+        var xbulletDraw = 0;
+        var ybulletDraw = 0;
+        var canShoot = true;
+
+        var gameStart = false;
+
+        var points = 1;
+
+        var enemyX = 1320;
+        var enemyY = 60;
+        var spawnPos = 1;
+
+        var canShoot = true;
+        var speed = 30;
+        var HasHappened = false;
+
+        document.onkeydown = function(evt) {
+           if (HasHappened == false){
+               if (gameStart == false){
+                   drawTheThings();
+                   gameStart = true;
+               }
+
+               evt = evt || window.event;
+               if (evt.key == "ArrowUp" || evt.key=="w") {
+                   moveItBud("up");
+               }
+               if (evt.key == "ArrowDown"|| evt.key=="s") {
+                   moveItBud("down");
+               }
+               if (evt.key == "ArrowRight"|| evt.key=="d") {
+                    moveItBud("right");
+               }
+               if (evt.key == "ArrowLeft"|| evt.key=="a") {
+                   moveItBud("left");
+               }
+               if (evt.key == "f"|| evt.key=="l") {
+                   WHYYYY();
+               }
+               if (evt.code == "Space" || evt.key == "e"){
+                   Shoot();
+               }
+            }
+        };
+
+
+        function enemyDead(){
+            enemyX = 1320;
+            if (spawnPos == 1){
+                enemyY = 60;
+            }
+            else if (spawnPos == 2){
+                enemyY = 330;
+            }
+            else if (spawnPos == 3){
+                enemyY = 630;
+            }
+        }
+
+        var gameSpeed = 60;
+
+        function drawTheThings(){
+            ctx.clearRect(0, 0, mathCanvas.width, mathCanvas.height);
+            ctx.drawImage(img,xPos,yPos);
+
+            if (isBullet = true){
+                ctx.drawImage(bulletImg,xbulletDraw,ybulletDraw);
+                if (xbulletDraw < 1290){
+                    xbulletDraw += 50;
+                }
+                else{
+                    canShoot = true;
+                    isBullet = false;
+                }
+            }
+            enemyX -= 20;
+            checkEnemy();
+            ctx.drawImage(enemyImg, enemyX, enemyY);
+            if (lives < 1){
+                endGame();
+                return;
+            }
+            setTimeout(drawTheThings, gameSpeed);
+        }
+        var gameEnded = false;
+        function endGame(){
+           gameEnded = true;
+        }
+        var lives = 3;
+        function checkEnemy(){
+            if (enemyX < 1){
+                if (spawnPos < 3){
+                    spawnPos += 1;
+                }
+                else{
+                    spawnPos = 1;
+                }
+                lives -= 1;
+                enemyDead();
+            }
+
+            megaDifferenceX = xbulletDraw - enemyX;
+            if (megaDifferenceX < 0){
+                megaDifferenceX = megaDifferenceX * -1;
+            }
+
+            megaDifferenceY = ybulletDraw - enemyY;
+            if (megaDifferenceY < 0){
+                megaDifferenceY = megaDifferenceY * -1;
+            }
+            if (megaDifferenceX < 81 && megaDifferenceY < 91){
+                if (spawnPos < 3){
+                    spawnPos += 1;
+                }
+                else{
+                    spawnPos = 1;
+                }
+                points += 1;
+
+                gameSpeed -= 0.5;
+
+                enemyDead();
+                }
+            if (gameEnded == false){
+                document.getElementById("points").innerHTML = " score: " + points + " --lives: " + lives;
+            }else{
+                document.getElementById("ScoreThing").innerHTML = points;
+            }
+        }
+
+        function Shoot(){
+            if (canShoot == true){
+                 isBullet = true;
+                 canShoot = false;
+                 xbulletDraw = xPos;
+                 ybulletDraw = yPos;
+             }
+        }
+
+        function moveItBud(_direction){
+
+
+            if (_direction == 'up'){
+                yPos -= speed;
+            }
+            else if (_direction == 'down'){
+                yPos += speed;
+            }
+            else if (_direction == 'right'){
+                xPos += speed;
+            }
+            else if (_direction == 'left'){
+                xPos -= speed;
+            }
+
+        }
+        function WHYYYY(){
+
+            if (HasHappened == false){
+
+                xPos = 0;
+                yPos = 0;
+                ctx.clearRect(0, 0, mathCanvas.width, mathCanvas.height);
+                ctx.drawImage(img,xPos,yPos);
+                ybulletDraw = yPos;
+                xbulletDraw = xPos;
+
+                ctx.drawImage(bulletImg,xbulletDraw,ybulletDraw);
+                HasHappened = true;
+                setTimeout(WHYYYY, 40);
+            }
+            else{
+                if (xPos < 1110){
+                    xPos += speed;
+                    ctx.clearRect(0, 0, mathCanvas.width, mathCanvas.height);
+                    ctx.drawImage(img,xPos,yPos);
+                ybulletDraw = yPos;
+                xbulletDraw = xPos;
+
+                ctx.drawImage(bulletImg,xbulletDraw,ybulletDraw);
+                    setTimeout(WHYYYY, 15);
+                }
+                else{
+                    downer();
+                }
+            }
+        }
+
+        function downer(){
+            if (yPos < 540){
+                yPos += speed;
+                ctx.clearRect(0, 0, mathCanvas.width, mathCanvas.height);
+                ctx.drawImage(img,xPos,yPos);
+                ybulletDraw = yPos;
+                xbulletDraw = xPos;
+
+                ctx.drawImage(bulletImg,xbulletDraw,ybulletDraw);
+                setTimeout(downer, 15);
+            }
+            else {
+                lefter();
+            }
+        }
+        function lefter(){
+            if (xPos > 0){
+                xPos -= speed;
+                ctx.clearRect(0, 0, mathCanvas.width, mathCanvas.height);
+                ctx.drawImage(img,xPos,yPos);
+                ybulletDraw = yPos;
+                xbulletDraw = xPos;
+
+                ctx.drawImage(bulletImg,xbulletDraw,ybulletDraw);
+                setTimeout(lefter, 15);
+            }
+            else{
+                finale1();
+            }
+        }
+        function finale1(){
+            if (yPos > 0){
+                yPos -= speed;
+                ctx.clearRect(0, 0, mathCanvas.width, mathCanvas.height);
+                ctx.drawImage(img,xPos,yPos);
+
+                ybulletDraw = yPos;
+                xbulletDraw = xPos;
+
+                ctx.drawImage(bulletImg,xbulletDraw,ybulletDraw);
+                setTimeout(finale1, 15);
+            }
+            else {
+                HasHappened = false;
+            }
+        }
+    </script>
+</body>
+</html>
